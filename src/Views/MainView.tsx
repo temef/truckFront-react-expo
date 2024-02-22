@@ -1,27 +1,28 @@
 import domtoimage from "dom-to-image";
-import { Camera, CameraType } from "expo-camera";
+import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import { StatusBar } from "expo-status-bar";
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+// eslint-disable-next-line import/order
 import { captureRef } from "react-native-view-shot";
-
-import React from "react";
+import { useImageContext } from "../Providers/ImageProvider";
 import Button from "../components/Button";
-import ImageViewer from "../components/ImageViewer";
+import { ImageViewer } from "../components/ImageViewer";
+import { useTypedNavigation } from "../hooks/useTypedNavigation";
 
 // xCode
 
 export const MainView = () => {
-  const [selectedImage, setSelectedImage] = useState<null | string>(null);
+  const { selectedImage, setSelectedImage } = useImageContext();
+
+  const { navigate } = useTypedNavigation();
+  const [imageScanned, setImageScanned] = React.useState<boolean>(false);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [pickedEmoji, setPickedEmoji] = useState(null);
-  const [showCamera, setShowCamera] = useState(false);
-
-  const [type, setType] = useState(CameraType.back);
 
   const [permission, requestPermissionCamera] = Camera.useCameraPermissions();
   const [status, requestPermission] = MediaLibrary.usePermissions();
@@ -33,7 +34,7 @@ export const MainView = () => {
   React.useEffect(() => {
     requestPermission();
     requestPermissionCamera();
-  }, []);
+  }, [requestPermission, requestPermissionCamera]);
 
   if (status === null) {
     requestPermission();
@@ -48,20 +49,29 @@ export const MainView = () => {
     setIsModalVisible(false);
   };
 
-  const toggleCameraType = async () => {
-    setType((current) =>
-      current === CameraType.back ? CameraType.front : CameraType.back,
-    );
-  };
+  // aina kun kuva vaihtuu niin myös scannaus puuttuu
+  React.useEffect(() => {
+    setImageScanned(false);
+  }, [selectedImage]);
 
   const onSaveImageAsync = async () => {
+    console.log("onSaveImageAsync", imageRef);
     if (Platform.OS !== "web") {
       try {
-        const localUri = await captureRef(imageRef, {
-          height: 440,
-          quality: 1,
-        });
+        const localUri = await captureRef(imageRef);
 
+        // // tähän se fetch bäkkäri?
+        // const data = await fetch("localhost:5001/scan", {
+        //   body: localUri,
+        // });
+
+        // const resp = await data.json()
+
+        // // respissä ois uus image, missä renkaat?
+        // voitais viel päivittää setSelectedImage(resp.image)
+        setImageScanned(true);
+
+        console.log("poggg", localUri);
         await MediaLibrary.saveToLibraryAsync(localUri);
         if (localUri) {
           alert("Saved!");
@@ -91,8 +101,6 @@ export const MainView = () => {
 
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri);
-
-      setShowCamera(false);
     } else {
       alert("You did not select any image.");
     }
@@ -108,9 +116,14 @@ export const MainView = () => {
         ) : (
           <View style={{ flex: 1 }}>
             <View style={styles.image}>
-              <ImageViewer selectedImage={selectedImage} />
-
-              <Button theme="secondary" label="Scan" onPress={() => {}} />
+              <ImageViewer ref={imageRef} selectedImage={selectedImage} />
+              {!imageScanned ? (
+                <Button
+                  theme="secondary"
+                  label="Scan"
+                  onPress={onSaveImageAsync}
+                />
+              ) : null}
             </View>
           </View>
         )}
@@ -127,7 +140,7 @@ export const MainView = () => {
             theme="camera"
             label="Take a photo"
             onPress={() => {
-              setShowCamera(true);
+              navigate("Camera");
             }}
           />
         </View>
@@ -136,15 +149,7 @@ export const MainView = () => {
     </GestureHandlerRootView>
   );
 };
-{
-  /* <View style={{ marginTop: 10 }}>
-<Button
-  theme="secondary"
-  label="Use this photo"
-  onPress={() => setShowAppOptions(true)}
-/>
-</View> */
-}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -161,22 +166,19 @@ const styles = StyleSheet.create({
   },
 
   footerContainer: {
-    flex: 1 / 4,
+    flex: 1 / 8,
     alignItems: "center",
     flexDirection: "column",
     justifyContent: "center",
   },
-  optionsContainer: {
-    position: "absolute",
-    bottom: 80,
-  },
+
   optionsRow: {
     alignItems: "center",
     flexDirection: "row",
   },
   image: {
     flex: 1,
-    backgroundColor: "red",
+
     width: "100%",
   },
   textContainer: {

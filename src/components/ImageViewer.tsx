@@ -1,11 +1,13 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import { Image, StyleSheet } from "react-native";
 
-export default function ImageViewer({ selectedImage }) {
-  const imageSource = { uri: selectedImage };
+export const ImageViewer = forwardRef<Image, { selectedImage: string }>(
+  function ImageViewer({ selectedImage }, ref) {
+    const imageSource = { uri: selectedImage };
 
-  return <Image source={imageSource} style={styles.image} />;
-}
+    return <Image ref={ref} source={imageSource} style={styles.image} />;
+  },
+);
 
 const styles = StyleSheet.create({
   image: {

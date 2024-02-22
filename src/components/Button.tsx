@@ -83,10 +83,14 @@ export default function Button({ label, theme, onPress }) {
           {
             position: "absolute",
             bottom: 10,
+
             alignSelf: "center",
             borderWidth: 3,
             borderColor: "#2AAA8A",
             borderRadius: 18,
+
+            width: 140, //"45%",
+            height: 48, //"60%",
           },
         ]}
       >

@@ -3,7 +3,7 @@ import { Camera, CameraType } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import { useRef, useState } from "react";
-import { Platform, StyleSheet } from "react-native";
+import { Platform } from "react-native";
 import { captureRef } from "react-native-view-shot";
 
 import React from "react";
@@ -16,8 +16,7 @@ const PlaceholderImage = require("./assets/images/background-image.png");
 export default function App() {
   const [selectedImage, setSelectedImage] = useState<null | string>(null);
   const [showAppOptions, setShowAppOptions] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [pickedEmoji, setPickedEmoji] = useState(null);
+
   const [showCamera, setShowCamera] = useState(false);
 
   const [type, setType] = useState(CameraType.back);
@@ -32,30 +31,12 @@ export default function App() {
   React.useEffect(() => {
     requestPermission();
     requestPermissionCamera();
-  }, []);
+  }, [requestPermission, requestPermissionCamera]);
 
   if (status === null) {
     requestPermission();
     requestPermissionCamera();
   }
-
-  const onReset = () => {
-    setShowAppOptions(false);
-  };
-
-  const onAddSticker = () => {
-    setIsModalVisible(true);
-  };
-
-  const onModalClose = () => {
-    setIsModalVisible(false);
-  };
-
-  const toggleCameraType = async () => {
-    setType((current) =>
-      current === CameraType.back ? CameraType.front : CameraType.back,
-    );
-  };
 
   const onSaveImageAsync = async () => {
     if (Platform.OS !== "web") {
@@ -107,32 +88,3 @@ export default function App() {
 
   return <Navigation />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#25292e",
-    alignItems: "center",
-    width: "100%",
-  },
-  imageContainer: {
-    flex: 1,
-    paddingTop: 56,
-    width: "100%",
-    alignItems: "center",
-  },
-
-  footerContainer: {
-    flex: 1 / 3,
-    alignItems: "center",
-    flexDirection: "column",
-  },
-  optionsContainer: {
-    position: "absolute",
-    bottom: 80,
-  },
-  optionsRow: {
-    alignItems: "center",
-    flexDirection: "row",
-  },
-});
