@@ -1,5 +1,7 @@
-import { View, Pressable, StyleSheet } from "react-native";
+/* eslint-disable react-native/no-color-literals */
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import React from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 
 export default function CircleButton({ onPress }) {
   return (
@@ -12,20 +14,20 @@ export default function CircleButton({ onPress }) {
 }
 
 const styles = StyleSheet.create({
-  circleButtonContainer: {
-    width: 84,
-    height: 84,
-    marginHorizontal: 60,
-    borderWidth: 4,
-    borderColor: "#ffd33d",
-    borderRadius: 42,
-    padding: 3,
-  },
   circleButton: {
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 42,
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
+  },
+  circleButtonContainer: {
+    borderColor: "#ffd33d",
     borderRadius: 42,
-    backgroundColor: "#fff",
+    borderWidth: 4,
+    height: 84,
+    marginHorizontal: 60,
+    padding: 3,
+    width: 84,
   },
 });

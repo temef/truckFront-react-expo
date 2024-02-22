@@ -1,5 +1,6 @@
-import { StyleSheet, View, Pressable, Text } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Button({ label, theme, onPress }) {
   if (theme === "photo") {
@@ -79,11 +80,18 @@ export default function Button({ label, theme, onPress }) {
       <View
         style={[
           styles.buttonContainer,
-          { borderWidth: 4, borderColor: "#2AAA8A", borderRadius: 18 },
+          {
+            position: "absolute",
+            bottom: 10,
+            alignSelf: "center",
+            borderWidth: 3,
+            borderColor: "#2AAA8A",
+            borderRadius: 18,
+          },
         ]}
       >
         <Pressable
-          style={[styles.button, { backgroundColor: "#fff" }]}
+          style={[styles.button, { backgroundColor: "rgba(255,255,255,0.8)" }]}
           onPress={onPress}
         >
           <Text style={[styles.buttonLabelSecondary, { color: "#25292e" }]}>
